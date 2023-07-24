@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "api.h"
+#include "bigmap.h"
 #include "pallets.h"
 
 //[BEGIN INCLUDES]
@@ -18,7 +19,7 @@ char unsigned *collisiondata;
 bool handleevents;
 
 #define occupiedLen 		65536
-bool occupied[occupiedLen];
+//bool occupied[occupiedLen];//redo as less u32s
 
 short unsigned *colorpallet_src;
 u32 colorpalletLen;
@@ -32,6 +33,9 @@ int map_main_height;
 
 u32 link_x;
 u32 link_y;
+
+u32 current_function = 0;
+u32 current_line = 0;
 
 static const struct events *eventdata;//static const struct LogInterfaceDescriptor *LOG_INTERFACE 
 
@@ -49,6 +53,7 @@ bool select_pallet(const char *name){
 	if(strcmp(name, "indoors") == 0){
 		colorpallet_src		= (short unsigned *) indoorsPal;
 		colorpalletLen		= indoorsPalLen;
+		print("DID LOAD PALLET: indoors");
 		return				true;
 	}
 	//[END INDOORS PALLET]
@@ -73,6 +78,7 @@ bool select_tileset(const char *name){
 		collisiondata		= (char unsigned *) indoorsCollision;
 		tiledata			= (short unsigned *) indoorsTiles;
 		tilesetLen 			= indoorsTilesLen;
+		print("DID LOAD TILESET: indoors");
 		select_pallet("indoors");
 		return				true;
 	}
@@ -100,6 +106,7 @@ bool select_map(const char *name){
 		mapdata 			= (short unsigned *) firstroomMap;
 		map_main_width		= firstroomMapWidth;
 		map_main_height		= firstroomMapHeight;
+		print("DID LOAD MAP: firstroom");
 		select_tileset("indoors");
 		return				true;
 	}
@@ -109,17 +116,43 @@ bool select_map(const char *name){
 	return 					false;
 }
 
-bool teleport(const char *scenename, uint x, uint y){
+bool select_scene(const char *scenename){
 	bool ret = false;
-	if(strcmp(scenename, "firstroom") == 0){
-		eventdata			= &firstscene_events;
-		ret					= true;
+	/*[BEGIN SCENE TEMPLATE]
+	if(strcmp(name, "[title]") == 0){
+		eventdata 			= &[title]_events;
+		ret 				= true;
 	}
+	[END SCENE TEMPLATE]*/
 	
+	//[BEGIN FIRSTROOM SCENE]
+	if(strcmp(scenename, "firstroom") == 0){
+		print("DID LOAD SCENE: firstroom");
+		eventdata			= &firstscene_events;
+		ret 				= true;
+	}
+	//[BEGIN FIRSTROOM SCENE]
+	
+//[END SCENE CASE]
 	if(ret){
-		eventdata->load();
+		if(eventdata->load == NULL){
+			print("LOAD EVENT WAS NULL!!!!!");
+		} else {
+			print("RUNNING LOAD EVENT");
+			eventdata->load();
+		}
 	}
 	return 					ret;
+}
+
+bool teleport(const char *scenename, uint x, uint y){
+	link_x					= x * 10;
+	link_y					= y * 10;
+	if(select_scene(scenename)){
+		init_map_main(colorpallet_src, colorpalletLen, colorpallet_src, tilesetLen, mapdata, map_main_width, map_main_height, link_x, link_y);
+		return				true;
+	}
+	return 					false;
 }
 
 
@@ -130,11 +163,11 @@ bool teleport(const char *scenename, uint x, uint y){
 
 
 void clearoccupied(u32 map_width, u32 map_height){
-	uint i, len;
-	len = map_width * map_height;
-	for(i = 0; i < len; i++){
+	//uint i, len;
+	//len = map_width * map_height;
+	/*for(i = 0; i < len; i++){
 		occupied[i] = false;
-	}
+	}*/
 }
 
 int grid(int pos){
@@ -178,9 +211,9 @@ void logval(char* format, int x){//format = text: %d
 }
 
 bool is_occupied(uint index, uint theside, bool middle, bool full){
-	if(occupied[index]){
+	/*if(occupied[index]){
 		return 		false;
-	}
+	}*/
 	uint tileid		= mapdata[index];
 	bool flipx 		= (tileid & 1024) == 1024;
 	bool flipy 		= (tileid & 2048) == 2048;

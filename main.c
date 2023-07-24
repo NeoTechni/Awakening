@@ -176,11 +176,13 @@ void change_mode(int newmode){
 		case 1://          *colorpallet, colorpalletLen, tileset,       tilesetLen,      *map,         width,             height,          link_x, link_y) {
 			//init_map_main(kakarikoPal, kakarikoPalLen, kakarikoTiles, 0,               kakarikoMap,  128,               128,                120, 8);
 			REG_BG1CNT |= 128;
-			init_map_main(indoorsPal,    indoorsPalLen,  indoorsTiles,  indoorsTilesLen, firstroomMap, firstroomMapWidth, firstroomMapHeight, 120, 50);
-			collisiondata	= (char unsigned *) indoorsCollision;
+			print("loading scene: firstroom");
+			select_scene("firstroom");
+			//init_map_main(indoorsPal,    indoorsPalLen,  indoorsTiles,  indoorsTilesLen, firstroomMap, firstroomMapWidth, firstroomMapHeight, 120, 50);
+			//collisiondata	= (char unsigned *) indoorsCollision;
 			break;
 	}
-	print("Changed mode: ");
+	logval("Changed mode: %d", newmode);
 	mode = newmode;
 }
 
@@ -188,7 +190,7 @@ int main(){
 	irq_init(NULL);
 	irq_add(II_VBLANK, NULL);
 	
-	print("initialized");
+	print("main initialized");
 	
 	change_mode(0);
 	

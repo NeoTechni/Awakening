@@ -1,6 +1,9 @@
 #ifndef API_C
 #define API_C
 
+#include <tonc.h>
+#include <stdbool.h>
+
 //[BEGIN EVENTS]
 typedef bool event_load(void);
 typedef bool event_tile_enter(u32 x, u32 y);
@@ -22,6 +25,8 @@ typedef struct events{
 bool select_pallet(const char *name);
 bool select_tileset(const char *name);
 bool select_map(const char *name);
+bool select_scene(const char *scenename);
+bool teleport(const char *scenename, uint x, uint y);
 
 extern short unsigned *mapdata;
 extern short unsigned *tiledata;
@@ -37,4 +42,7 @@ int grid(int pos);
 
 uint can_move_x(uint cx, uint cy, uint x, uint y, uint width, uint height, int bywhat, bool partial, bool middle, bool full);
 uint can_move_y(uint cx, uint cy, uint x, uint y, uint width, uint height, int bywhat, bool partial, bool middle, bool full);
+
+extern u32 current_function;
+extern u32 current_line;
 #endif
