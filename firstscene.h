@@ -1,0 +1,1 @@
+static const struct events firstscene_events;
