@@ -12,9 +12,10 @@ extern const unsigned short [title][[pixels]];
 
 //[BEGIN INTRO1]
 
-#define intro1Len 28672
-#define intro1Width 128
-#define intro1Height 112
-extern const unsigned short intro1[14336];
+#define intro1Len 69120
+#define intro1Width 240
+#define intro1Height 144
+extern const unsigned short intro1[34560];
+
 //[END INTRO1]
 #endif /* ASSETS_H */

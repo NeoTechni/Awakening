@@ -1,6 +1,15 @@
-//
-// main.c
-//
+/*
+	todo:
+	- collision detection for object regions, each frame can have a region
+	- animations and pallet swapping
+	- UI needs an event editor
+		- teleport events write directly to the stage function queue for simplicity
+	- API to edit map at runtime
+	- sidescroller mode
+	- inventory grid mode
+	- menu mode
+	- font editor
+*/
 
 //"C:\devkitPro\visualboyadvance-m.exe" "E:\VB6\GBA\Projects\Awakening\Awakening.gba"
 
@@ -69,100 +78,6 @@ uint se_index(uint tx, uint ty, uint pitch){
 
 int mode = -1;
 
-enum transitions {
-	trans_none				= 0,
-	
-	trans_wipe_left,
-	trans_wipe_right,
-	trans_wipe_up,
-	trans_wipe_down,
-	
-	trans_uncover_left,
-	trans_uncover_right,
-	trans_uncover_up,
-	trans_uncover_down,
-	
-	trans_fade_to_black,
-	trans_fade_to_white,
-	trans_fade_from_black,
-	trans_fade_from_white,
-	
-	trans_mozaic
-};
-
-u32 trans_mode 				= trans_none;
-int trans_frame 			= 0;
-int trans_speed				= 0;
-
-void transition(u32 new_trans_mode){
-	if (new_trans_mode == trans_none){//draw current transition
-		if(trans_mode > trans_none){
-			int limit 		= 0;
-			int temp 		= 0;
-			int speed 		= trans_speed;
-			trans_frame 	+= speed;
-			
-			switch(trans_mode){
-				case trans_wipe_left:
-					print("wipe left");
-					limit 	= SCREEN_WIDTH;
-					temp 	= SCREEN_WIDTH - trans_frame;
-					m3_rect(temp, 0, temp + speed, SCREEN_HEIGHT, CLR_WHITE);
-					break;
-				case trans_wipe_right:
-					print("wipe left");
-					limit 	= SCREEN_WIDTH;
-					temp 	= trans_frame - speed;
-					m3_rect(temp, 0, trans_frame, SCREEN_HEIGHT, CLR_BLACK);
-					break;
-				
-				case trans_wipe_up:
-					print("wipe left");
-					limit 	= SCREEN_HEIGHT;
-					temp 	= SCREEN_HEIGHT - trans_frame;
-					m3_rect(0, temp, SCREEN_WIDTH, temp + speed, CLR_BLACK);
-					break;
-				case trans_wipe_down:
-					print("wipe left");
-					limit 	= SCREEN_WIDTH;
-					temp 	= trans_frame - speed;
-					m3_rect(0, temp, SCREEN_WIDTH, trans_frame, CLR_BLACK);
-					break;
-					
-				case trans_fade_to_black:					
-					print("fade to black");
-					
-					break;
-				case trans_fade_to_white:					
-					print("fade to white");
-					
-					break;
-					
-				case trans_mozaic:
-					print("mozaic");
-					limit 	= 255;
-					temp 	= trans_frame >> 4;
-					REG_MOSAIC = MOS_BUILD(temp, temp, temp, temp);
-					break;
-			}
-			
-			if(trans_frame > limit){
-				trans_frame = 0;
-				trans_mode = new_trans_mode;
-				clear_screen();
-			}
-		}
-	} else if(trans_frame == 0) {
-		trans_mode 			= new_trans_mode;
-		trans_speed			= 8;
-		switch(trans_mode){
-			case trans_mozaic:
-				REG_BG1CNT	= REG_BG1CNT | BG_MOSAIC;
-				trans_speed	= 1;
-		}
-	}
-}
-
 void change_mode(int newmode){
 	//switch(mode){//exiting this mode
 	//	case 0:
@@ -176,8 +91,8 @@ void change_mode(int newmode){
 		case 1://          *colorpallet, colorpalletLen, tileset,       tilesetLen,      *map,         width,             height,          link_x, link_y) {
 			//init_map_main(kakarikoPal, kakarikoPalLen, kakarikoTiles, 0,               kakarikoMap,  128,               128,                120, 8);
 			REG_BG1CNT |= 128;
-			print("loading scene: firstroom");
-			select_scene("firstroom");
+			print("loading scene: firstscene");
+			select_scene("first");
 			//init_map_main(indoorsPal,    indoorsPalLen,  indoorsTiles,  indoorsTilesLen, firstroomMap, firstroomMapWidth, firstroomMapHeight, 120, 50);
 			//collisiondata	= (char unsigned *) indoorsCollision;
 			break;
@@ -217,13 +132,6 @@ int main(){
 			}
 		} else {
 			map_main();
-			/*if(key_is_down(KEY_B)){
-				transition(trans_mozaic);
-			} else if(key_is_down(KEY_R)){
-				transition(trans_wipe_right);
-			} else if(key_is_down(KEY_L)){
-				transition(trans_wipe_left);
-			}*/
 		}
 		
 		transition(trans_none);

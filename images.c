@@ -27,6 +27,7 @@ void draw_image(const void *src, uint width, uint height){
 #include <string.h>
 
 #include "assets.h"
+#include "api.h"
 //#include "images.h"
 
 #ifndef IMAGES_C
@@ -43,7 +44,7 @@ bool select_image(const char *name){
 	if(strcmp(name, "[title]") == 0){
 		image_src 			= (short unsigned *) [title];
 		image_width 		= [title]Width;
-		image_height 		= [title]Width;
+		image_height 		= [title]Height;
 		return				true;
 	}
 	[END SWITCH TEMPLATE]*/
@@ -54,16 +55,13 @@ bool select_image(const char *name){
 	if(strcmp(name, "intro1") == 0){
 		image_src 			= (short unsigned *) intro1;
 		image_width 		= intro1Width;
-		image_height 		= intro1Width;
+		image_height 		= intro1Height;
 		return				true;
 	}
-	//[END INTRO1]
+	
+//[END INTRO1]
 //[END SWITCH CASE]
 	return 					false;
-}
-
-void clear_screen(){
-	m3_fill(CLR_BLACK);
 }
 
 void draw_image_raw(const void *src, uint width, uint height, int x, int y){

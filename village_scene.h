@@ -1,0 +1,1 @@
+extern const struct events village_events;
